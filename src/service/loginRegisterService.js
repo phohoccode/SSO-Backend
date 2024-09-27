@@ -112,9 +112,14 @@ const handleUserLogin = async (rawData) => {
                         username: user.username
                     }
                 }
+            }  else {
+                return {
+                    EM: 'Mật khẩu không khớp!',
+                    EC: 1,
+                    DT: ''
+                }
             }
-        }
-
+        } 
 
         return {
             EM: 'Your email/phone number or password is incorrect!',
