@@ -83,6 +83,7 @@ const checkPassword = (inputPassword, hashPassword) => {
 
 const handleUserLogin = async (rawData) => {
     try {
+        
         let user = await db.User.findOne({
             where: {
                 [Op.or]: [

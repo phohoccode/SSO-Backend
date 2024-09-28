@@ -5,6 +5,7 @@ import passport from 'passport'
 const configSession = (app) => {
     const SequelizeStore = require("connect-session-sequelize")(session.Store);
 
+    
     // Tạo kết nối đến sequelize
     const sequelize = new Sequelize(
         process.env.DB_NAME,
@@ -44,7 +45,7 @@ const configSession = (app) => {
 
     // Mã hóa: chuyển định dạng user thành dạng có thể lưu trữ trong session
     passport.serializeUser(function (user, cb) {
-        process.nextTick(function () {
+        process.nextTick(function () {            
             cb(null, user)
         });
     });

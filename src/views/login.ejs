@@ -16,7 +16,41 @@
 
     <!-- Latest compiled JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
   </head>
+
+  <style>
+    .flash {
+      display: none;
+    }
+  </style>
+
+  <script>
+    $(document).ready(function () {
+      $("#btn-login").on("click", function () {
+        const username = $("#username").val();
+        const password = $("#password").val();
+
+        $("#flashMsg").empty('');
+
+        $.ajax({
+          type: "POST",
+          url: `${window.location.origin}/login`,
+          data: { username, password },
+          withCredentials: true,
+          success: function (data) {
+            $("#flashMsg").addClass("flash");
+            window.location.href = '/'
+          },
+          error: function (request, status, error) {
+            $("#password").val("");
+            $("#flashMsg").removeClass("flash");
+            $("#flashMsg").append(request.responseText);
+          },
+        });
+      });
+    });
+  </script>
 
   <body>
     <div class="container">
@@ -26,15 +60,18 @@
             <fieldset class="border rounded-3 p-3">
               <legend class="float-none w-auto px-3">Đăng nhập</legend>
 
-              <% if(error != '') {%>
-                <div class="alert alert-danger" role="alert"><%= error %></div>
-              <%} %>
+              <div
+                class="alert alert-danger my-1 flash"
+                role="alert"
+                id="flashMsg"
+              ></div>
+
               <div class="mb-3 col-12">
                 <label for="exampleInputEmail1" class="form-label">Email</label>
                 <input
                   type="email"
                   class="form-control"
-                  id="exampleInputEmail1"
+                  id="username"
                   name="username"
                 />
               </div>
@@ -45,11 +82,13 @@
                 <input
                   type="password"
                   class="form-control"
-                  id="exampleInputPassword1"
+                  id="password"
                   name="password"
                 />
               </div>
-              <button type="submit" class="btn btn-primary">Đăng nhập</button>
+              <button type="button" id="btn-login" class="btn btn-primary">
+                Đăng nhập
+              </button>
               <hr />
               <div class="text-center">
                 <span>Hoặc đăng nhập với: </span>
