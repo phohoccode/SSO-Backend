@@ -1,6 +1,9 @@
 
 const getLoginPage = (req, res) => {
-    return res.render("login.ejs", { error: req.flash('message') })
+    const { serviceURL } = req.query
+    return res.render("login.ejs", {
+        redirectURL: serviceURL
+    })
 }
 
 module.exports = {

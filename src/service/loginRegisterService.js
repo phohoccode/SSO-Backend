@@ -4,6 +4,7 @@ import bcrypt from 'bcryptjs';
 import { Op } from 'sequelize';
 import { getGroupWithRoles } from './JWTService';
 import { createJWT } from '../middleware/JWTAction';
+import { v4 as uuidv4 } from 'uuid'
 
 const salt = bcrypt.genSaltSync(10);
 
@@ -83,7 +84,7 @@ const checkPassword = (inputPassword, hashPassword) => {
 
 const handleUserLogin = async (rawData) => {
     try {
-        
+
         let user = await db.User.findOne({
             where: {
                 [Op.or]: [
@@ -95,32 +96,33 @@ const handleUserLogin = async (rawData) => {
 
         if (user) {
             let isCorrectPassword = checkPassword(rawData.password, user.password);
-            if (isCorrectPassword === true) {
-                let groupWithRoles = await getGroupWithRoles(user);
-                let payload = {
-                    email: user.email,
-                    groupWithRoles,
-                    username: user.username,
-                }
-                let token = createJWT(payload);
+            if (isCorrectPassword) {
+                // let groupWithRoles = await getGroupWithRoles(user);
+                // let payload = {
+                //     email: user.email,
+                //     groupWithRoles,
+                //     username: user.username,
+                // }
+                // let token = createJWT(payload);
                 return {
                     EM: 'ok!',
                     EC: 0,
                     DT: {
-                        access_token: token,
-                        groupWithRoles,
-                        email: user.email,
-                        username: user.username
+                        code: uuidv4()
+                        // access_token: token,
+                        // groupWithRoles,
+                        // email: user.email,
+                        // username: user.username
                     }
                 }
-            }  else {
+            } else {
                 return {
                     EM: 'Mật khẩu không khớp!',
                     EC: 1,
                     DT: ''
                 }
             }
-        } 
+        }
 
         return {
             EM: 'Your email/phone number or password is incorrect!',
