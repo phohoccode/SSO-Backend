@@ -28,7 +28,7 @@ const initWebRoutes = (app) => {
 
     router.get('/login', checkUser.isLogin, loginController.getLoginPage)
 
-    app.post('/login', function (req, res, next) {
+    router.post('/login', function (req, res, next) {
         passport.authenticate('local', function (error, user, info) {
             if (error) {
                 return res.status(500).json(error);
@@ -38,13 +38,17 @@ const initWebRoutes = (app) => {
             }
             req.login(user, function (err) {
                 if (err) return next(err)
+                console.log('>>> req.body', req.body)
+                console.log('>>> user', user)
                 // return res.redirect(req.body.serviceURL)
                 return res.status(200).json({ ...user, redirectURL: req.body.serviceURL })
             })
         })(req, res, next);
     });
 
-    app.post('/logout', passportController.handleLogout);
+    router.post('/logout', passportController.handleLogout);
+
+    router.post('/verify-token', loginController.verifySSOToken)
 
     return app.use("/", router);
 }

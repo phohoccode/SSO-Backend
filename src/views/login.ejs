@@ -41,6 +41,7 @@
           withCredentials: true,
           success: function (data) {
             $("#flashMsg").addClass("flash");
+            console.log('>>> data', data)
             const redirectURL = `${data.redirectURL}/code?ssoToken=${data.code}`
             window.location.href = redirectURL
           },

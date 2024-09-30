@@ -97,7 +97,7 @@ const handleUserLogin = async (rawData) => {
         if (user) {
             let isCorrectPassword = checkPassword(rawData.password, user.password);
             if (isCorrectPassword) {
-                // let groupWithRoles = await getGroupWithRoles(user);
+                let groupWithRoles = await getGroupWithRoles(user);
                 // let payload = {
                 //     email: user.email,
                 //     groupWithRoles,
@@ -108,11 +108,10 @@ const handleUserLogin = async (rawData) => {
                     EM: 'ok!',
                     EC: 0,
                     DT: {
-                        code: uuidv4()
-                        // access_token: token,
-                        // groupWithRoles,
-                        // email: user.email,
-                        // username: user.username
+                        code: uuidv4(),
+                        email: user.email,
+                        groupWithRoles,
+                        username: user.username
                     }
                 }
             } else {
@@ -125,7 +124,7 @@ const handleUserLogin = async (rawData) => {
         }
 
         return {
-            EM: 'Your email/phone number or password is incorrect!',
+            EM: 'Email/Số điện thoại hoặc mật khẩu của bạn không chính xác!',
             EC: 1,
             DT: ''
         }
@@ -140,6 +139,26 @@ const handleUserLogin = async (rawData) => {
     }
 }
 
+const updateUserRefreshToken = async (email, token) => {
+    try {
+        await db.User.update(
+            { refreshToken: token },
+            { where: { email: email } }
+        )
+    } catch (error) {
+        console.log(error)
+        return {
+            EM: 'Somthing wrongs in service...',
+            EC: -2
+        }
+    }
+}
+
 module.exports = {
-    registerNewUser, handleUserLogin, hashUserPassword, checkEmailExist, checkPhoneExist
+    registerNewUser,
+    handleUserLogin,
+    hashUserPassword,
+    checkEmailExist,
+    checkPhoneExist,
+    updateUserRefreshToken
 }
