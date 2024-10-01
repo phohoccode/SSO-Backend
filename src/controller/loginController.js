@@ -29,6 +29,7 @@ const verifySSOToken = async (req, res) => {
                 email: req.user.email,
                 groupWithRoles: req.user.groupWithRoles,
                 username: req.user.username,
+                email: req.user.email
             }
 
             const token = createJWT(payload);
@@ -48,7 +49,8 @@ const verifySSOToken = async (req, res) => {
                 access_token: token,
                 refresh_token: refreshToken,
                 groupWithRoles: req.user.groupWithRoles,
-                username: req.user.username
+                username: req.user.username,
+                email: req.user.email
             }
 
             // xoá req.user trong session

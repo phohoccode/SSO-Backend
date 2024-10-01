@@ -33,14 +33,15 @@ const initWebRoutes = (app) => {
             if (error) {
                 return res.status(500).json(error);
             }
+
             if (!user) {
                 return res.status(401).json(info.message);
             }
+
             req.login(user, function (err) {
                 if (err) return next(err)
                 console.log('>>> req.body', req.body)
                 console.log('>>> user', user)
-                // return res.redirect(req.body.serviceURL)
                 return res.status(200).json({ ...user, redirectURL: req.body.serviceURL })
             })
         })(req, res, next);
@@ -49,6 +50,17 @@ const initWebRoutes = (app) => {
     router.post('/logout', passportController.handleLogout);
 
     router.post('/verify-token', loginController.verifySSOToken)
+
+    router.get('/auth/google',
+        passport.authenticate('google', { scope: ['profile', 'email'] }));
+
+    router.get('/google/redireact',
+        passport.authenticate('google', { failureRedirect: '/login' }),
+        function (req, res) {
+            // Successful authentication, redirect home.
+            console.log('>>> req.user', req.user)
+            res.redirect('/');
+        });
 
     return app.use("/", router);
 }

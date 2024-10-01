@@ -10,6 +10,7 @@ import { configPassport } from './controller/passportController'
 import connection from "./config/connectDB";
 import configSession from "./config/session";
 import flash from 'connect-flash'
+import configLoginWithGoogle from "./controller/social/googleController";
 
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -43,7 +44,9 @@ app.use((req, res) => {
     return res.send('404 not found')
 })
 
+// config passport
 configPassport()
+configLoginWithGoogle()
 
 app.listen(PORT, () => {
     console.log(">>> JWT Backend is running on the port = " + PORT);
