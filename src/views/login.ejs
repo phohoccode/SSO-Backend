@@ -32,7 +32,7 @@
         const password = $("#password").val();
         const serviceURL = $("#redirectURL").val();
 
-        $("#flashMsg").empty('');
+        $("#flashMsg").empty("");
 
         $.ajax({
           type: "POST",
@@ -41,9 +41,9 @@
           withCredentials: true,
           success: function (data) {
             $("#flashMsg").addClass("flash");
-            console.log('>>> data', data)
-            const redirectURL = `${data.redirectURL}/code?ssoToken=${data.code}`
-            window.location.href = redirectURL
+            console.log(">>> data", data);
+            const redirectURL = `${data.redirectURL}/code?ssoToken=${data.code}`;
+            window.location.href = redirectURL;
           },
           error: function (request, status, error) {
             $("#password").val("");
@@ -52,11 +52,23 @@
           },
         });
       });
+   
+      $('#google').on('click', function() {
+        localStorage.removeItem('clientURL')
+        localStorage.setItem('clientURL', $('#redirectURL').val())
+        window.location.href = '/auth/google'
+      })
+
+       $('#facebook').on('click', function() {
+        localStorage.removeItem('clientURL')
+        localStorage.setItem('clientURL', $('#redirectURL').val())
+        window.location.href = '/auth/facebook'
+      })
     });
   </script>
 
   <body>
-    <input type="text" value="<%= redirectURL %>" hidden id="redirectURL">
+    <input type="text" value="<%= redirectURL %>" hidden id="redirectURL" />
     <div class="container">
       <div class="row">
         <form action="/login" method="POST">
@@ -98,21 +110,20 @@
                 <span>Hoặc đăng nhập với: </span>
               </div>
               <div class="text-center mt-2">
-                <a href="/auth/google">
-                    <i
-                      style="font-size: 32px; cursor: pointer; margin-right: 12px"
-                      class="bi bi-google"
-                      title="Đăng nhập với Google"
-                    >
-                    </i>
-                </a>
-                <a href="">
-                    <i
-                      style="font-size: 32px; cursor: pointer"
-                      class="bi bi-facebook"
-                      title="Đăng nhập với facebook"
-                    ></i>
-                </a>
+                <i
+                  id="google"
+                  style="font-size: 32px; cursor: pointer; margin-right: 12px"
+                  class="bi bi-google"
+                  title="Đăng nhập với Google"
+                >
+                </i>
+
+                <i
+                  id="facebook"
+                  style="font-size: 32px; cursor: pointer"
+                  class="bi bi-facebook"
+                  title="Đăng nhập với facebook"
+                ></i>
               </div>
             </fieldset>
           </div>

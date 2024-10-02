@@ -1,3 +1,4 @@
+require('dotenv').config()
 import express from "express";
 import passport from 'passport'
 import homeController from '../controller/homeController';
@@ -39,9 +40,9 @@ const initWebRoutes = (app) => {
             }
 
             req.login(user, function (err) {
-                if (err) return next(err)
-                console.log('>>> req.body', req.body)
-                console.log('>>> user', user)
+                if (err) return next(err)   
+                // trả dữ liệu về client
+                console.log('>>> local-user', user)
                 return res.status(200).json({ ...user, redirectURL: req.body.serviceURL })
             })
         })(req, res, next);
@@ -51,15 +52,25 @@ const initWebRoutes = (app) => {
 
     router.post('/verify-token', loginController.verifySSOToken)
 
-    router.get('/auth/google',
+    router.get('/auth/google', 
         passport.authenticate('google', { scope: ['profile', 'email'] }));
 
     router.get('/google/redireact',
         passport.authenticate('google', { failureRedirect: '/login' }),
         function (req, res) {
-            // Successful authentication, redirect home.
-            console.log('>>> req.user', req.user)
-            res.redirect('/');
+            console.log('>>> google-user', req.user)
+            return res.render('social.ejs', { ssoToken: req.user.code })
+        });
+
+    router.get('/auth/facebook', 
+        passport.authenticate('facebook', { scope: ['email'] }));
+
+    router.get('/facebook/redireact',
+        passport.authenticate('facebook', { failureRedirect: '/login' }),
+        function (req, res) {
+            console.log('>>> facebook-user', req.user)
+
+            return res.render('social.ejs', { ssoToken: req.user.code })
         });
 
     return app.use("/", router);
