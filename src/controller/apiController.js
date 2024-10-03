@@ -45,7 +45,6 @@ const handleRegister = async (req, res) => {
 
 const handleLogin = async (req, res) => {
     try {
-        console.log('>>> req.body', req.body)
         let data = await loginRegisterService.handleUserLogin(req.body);
         //set cookie
         if (data && data.DT && data.DT.access_token) {
@@ -89,5 +88,8 @@ const handleLogout = (req, res) => {
 }
 
 module.exports = {
-    testApi, handleRegister, handleLogin, handleLogout
+    testApi,
+    handleRegister,
+    handleLogin,
+    handleLogout
 }

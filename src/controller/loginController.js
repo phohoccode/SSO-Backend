@@ -17,7 +17,6 @@ const verifySSOToken = async (req, res) => {
         const ssoToken = req.body.ssoToken
 
         // truy cập req.user thông qua passport
-        console.log('>>> verifySSOToken-req.user', req.user)
         if (req.user && req.user.code && req.user.code === ssoToken) {
             const refreshToken = uuidv4()
 

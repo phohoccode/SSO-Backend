@@ -17,7 +17,6 @@ const configPassport = () => {
 
         const res = await loginRegisterService.handleUserLogin(rawData)
         if (res && +res.EC === 0) {
-            console.log('>>> res', res);
             
             return done(null, res.DT);
         } else {

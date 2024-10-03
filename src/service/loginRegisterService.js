@@ -3,7 +3,6 @@ import db from '../models/index';
 import bcrypt from 'bcryptjs';
 import { Op } from 'sequelize';
 import { getGroupWithRoles } from './JWTService';
-import { createJWT } from '../middleware/JWTAction';
 import { v4 as uuidv4 } from 'uuid'
 
 const salt = bcrypt.genSaltSync(10);
@@ -98,12 +97,7 @@ const handleUserLogin = async (rawData) => {
             let isCorrectPassword = checkPassword(rawData.password, user.password);
             if (isCorrectPassword) {
                 let groupWithRoles = await getGroupWithRoles(user);
-                // let payload = {
-                //     email: user.email,
-                //     groupWithRoles,
-                //     username: user.username,
-                // }
-                // let token = createJWT(payload);
+
                 return {
                     EM: 'ok!',
                     EC: 0,
@@ -181,6 +175,33 @@ const upsertUserSocialMedia = async (typeAcc, dataRaw) => {
     }
 }
 
+const getUserByRefreshToken = async (token) => {
+    try {
+        
+        let user = await db.User.findOne({
+            where: { refreshToken: token }
+        })
+
+        if (user) {
+            let groupWithRoles = await getGroupWithRoles(user);
+
+            return {
+                EM: 'ok!',
+                EC: 0,
+                DT: {
+                    email: user.email,
+                    groupWithRoles: groupWithRoles,
+                    username: user.username,
+                }
+            }
+        }
+
+        return null
+    } catch (error) {
+        console.log(error)
+    }
+}
+
 module.exports = {
     registerNewUser,
     handleUserLogin,
@@ -188,5 +209,6 @@ module.exports = {
     checkEmailExist,
     checkPhoneExist,
     updateUserRefreshToken,
-    upsertUserSocialMedia
+    upsertUserSocialMedia,
+    getUserByRefreshToken
 }

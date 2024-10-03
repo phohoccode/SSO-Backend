@@ -55,7 +55,7 @@ const initWebRoutes = (app) => {
     router.get('/auth/google', 
         passport.authenticate('google', { scope: ['profile', 'email'] }));
 
-    router.get('/google/redireact',
+    router.get('/google/redirect',
         passport.authenticate('google', { failureRedirect: '/login' }),
         function (req, res) {
             console.log('>>> google-user', req.user)
@@ -65,7 +65,7 @@ const initWebRoutes = (app) => {
     router.get('/auth/facebook', 
         passport.authenticate('facebook', { scope: ['email'] }));
 
-    router.get('/facebook/redireact',
+    router.get('/facebook/redirect',
         passport.authenticate('facebook', { failureRedirect: '/login' }),
         function (req, res) {
             console.log('>>> facebook-user', req.user)
