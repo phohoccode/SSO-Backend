@@ -4,6 +4,7 @@ import bcrypt from 'bcryptjs';
 import { Op } from 'sequelize';
 import { getGroupWithRoles } from './JWTService';
 import { v4 as uuidv4 } from 'uuid'
+import { where } from 'sequelize/lib/sequelize';
 
 const salt = bcrypt.genSaltSync(10);
 
@@ -89,7 +90,8 @@ const handleUserLogin = async (rawData) => {
                 [Op.or]: [
                     { email: rawData.valueLogin },
                     { phone: rawData.valueLogin }
-                ]
+                ],
+                type: 'LOCAL'
             }
         })
 
@@ -177,7 +179,7 @@ const upsertUserSocialMedia = async (typeAcc, dataRaw) => {
 
 const getUserByRefreshToken = async (token) => {
     try {
-        
+
         let user = await db.User.findOne({
             where: { refreshToken: token }
         })
@@ -202,6 +204,78 @@ const getUserByRefreshToken = async (token) => {
     }
 }
 
+
+const updateUserCode = async (code, email) => {
+    try {
+        await db.User.update(
+            { code: code },
+            { where: { email: email, type: 'LOCAL' } }
+        )
+    } catch (error) {
+        console.log(error)
+        return {
+            EM: 'Somthing wrongs in service...',
+            EC: -2
+        }
+    }
+}
+
+const isEmailLocal = async (email) => {
+    try {
+        const user = await db.User.findOne({
+            where: { email: email, type: 'LOCAL' }
+        })
+
+        return user ? true : false
+
+    } catch (error) {
+        return false
+    }
+}
+
+const resetUserPassword = async (rawData) => {
+    try {
+
+        const newPassword = hashUserPassword(rawData.newPassword)
+
+        if (rawData.newPassword !== rawData.confirmPassword) {
+            return {
+                EC: -1,
+                EM: 'Mật khẩu mới và mật khẩu xác nhận phải giống nhau!'
+            }
+        }
+
+        const user = await db.User.update(
+            {
+                password: newPassword,
+                code: null
+            },
+            {
+                where: {
+                    email: rawData.email,
+                    type: 'LOCAL',
+                    code: rawData.code
+                }
+            }
+        )
+
+        if (user && user[0]) {
+            return {
+                EC: 0,
+                EM: 'Đặt lại mật khẩu thành công!'
+            }
+        } else {
+            return {
+                EC: 0,
+                EM: 'Đặt lại mật khẩu thất bại!'
+            }
+        }
+
+    } catch (error) {
+
+    }
+}
+
 module.exports = {
     registerNewUser,
     handleUserLogin,
@@ -210,5 +284,8 @@ module.exports = {
     checkPhoneExist,
     updateUserRefreshToken,
     upsertUserSocialMedia,
-    getUserByRefreshToken
+    getUserByRefreshToken,
+    updateUserCode,
+    isEmailLocal,
+    resetUserPassword
 }
