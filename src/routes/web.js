@@ -25,7 +25,11 @@ const initWebRoutes = (app) => {
 
     //rest api
     //GET - R, POST- C, PUT - U, DELETE - D
-    router.get("/api/test-api", apiController.testApi);
+    // router.get("/api/test-api", apiController.testApi);
+
+    router.get('/register', loginController.getRegisterPage)
+
+    router.post('/register', loginController.handleRegister)
 
     router.get('/login', checkUser.isLogin, loginController.getLoginPage)
 
@@ -78,7 +82,6 @@ const initWebRoutes = (app) => {
     router.post('/send-code', loginController.sendCode)
 
     router.post('/submit-reset-password', loginController.handleResetPassword)
-
 
     return app.use("/", router);
 }

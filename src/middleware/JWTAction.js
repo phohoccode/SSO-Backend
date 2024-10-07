@@ -43,6 +43,7 @@ const extractToken = (req) => {
 }
 
 const checkUserJWT = async (req, res, next) => {
+    
     if (nonSecurePaths.includes(req.path)) return next();
 
     let cookies = req.cookies;

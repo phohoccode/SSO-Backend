@@ -4,7 +4,6 @@ import passport from 'passport'
 
 const configSession = (app) => {
     const SequelizeStore = require("connect-session-sequelize")(session.Store);
-
     
     // Tạo kết nối đến sequelize
     const sequelize = new Sequelize(

@@ -7,7 +7,6 @@ import * as handlebars from 'handlebars';
 import * as fs from 'fs';
 import * as path from 'path';
 
-
 const getLoginPage = (req, res) => {
     const { serviceURL } = req.query
     return res.render("login.ejs", {
@@ -89,17 +88,24 @@ const getResetPasswordPage = (req, res) => {
 }
 
 const sendCode = async (req, res) => {
-
+    console.log('>>> type send code', req.body.type)
     const checkEmailLocal = await loginRegisterService.isEmailLocal(req.body.email)
 
-    if (!checkEmailLocal) {
+    if (!checkEmailLocal && req.body.type === 'forgot-password') {
         return res.json({
             message: 'Địa chỉ Email không tồn tại'
         })
     }
 
     const OTP = Math.floor(100000 + Math.random() * 900000)
-    const filePath = path.join(__dirname, '../templates/reset-password.html');
+
+    const filePath = path.join(
+        __dirname,
+        req.body.type === 'forgot-password' ?
+            '../templates/reset-password.html' :
+            '../templates/register.html'
+    );
+
     const source = fs.readFileSync(filePath, 'utf-8').toString();
     const template = handlebars.compile(source);
 
@@ -121,26 +127,29 @@ const sendCode = async (req, res) => {
     });
 
     try {
-        
+
         await transporter.sendMail({
             from: `phohoccode <${process.env.GOOGLE_APP_EMAIL}>`,
             to: `${req.body.email}`,
-            subject: "Đặt lại mật khẩu",
+            subject: req.body.type === 'forgot-password'
+                ? "Đặt lại mật khẩu"
+                : 'Xác minh tài khoản',
             text: "phohoccode",
             html: htmlToSend
         });
 
         // cập nhật mã code vào database
-       await loginRegisterService.updateUserCode(OTP, req.body.email)
-        
-       return res.json({
+        console.log(req.body)
+        await loginRegisterService.updateUserCode(OTP, req.body.email, req.body.type)
+
+        return res.json({
             message: 'Đã gữi mã xác nhận đến email của bạn!'
-       })
+        })
 
     } catch (error) {
         console.log(error);
     }
-   
+
 }
 
 const handleResetPassword = async (req, res) => {
@@ -152,7 +161,7 @@ const handleResetPassword = async (req, res) => {
             EC: data.EC,
             EM: data.EM
         })
-       
+
 
     } catch (error) {
         return res.status(500).json({
@@ -161,11 +170,39 @@ const handleResetPassword = async (req, res) => {
             DT: ''
         })
     }
-   
+
 }
 
+const getRegisterPage = (req, res) => {
+    console.log(req.query)
+    const { serviceURL } = req.query
+    return res.render("register.ejs", {
+        redirectURL: serviceURL
+    })
+}
+
+const handleRegister = async (req, res) => {
+    try {
+        console.log('>>> Register: ', req.body)
+
+        const data = await loginRegisterService.registerAccount(req.body)
+
+        return res.json({
+            EC: data.EC,
+            EM: data.EM
+        })
+    } catch (error) {
+        return res.status(500).json({
+            EC: -2,
+            EM: 'Internal error',
+            DT: ''
+        })
+    }
+}
 
 module.exports = {
+    handleRegister,
+    getRegisterPage,
     getLoginPage,
     verifySSOToken,
     getResetPasswordPage,

@@ -23,7 +23,7 @@ const initApiRoutes = (app) => {
 
     router.post('/verify-service-jwt', checkServiceJWT)
 
-    router.post("/register", apiController.handleRegister);
+    // router.post("/register", apiController.handleRegister);
     router.post("/login", apiController.handleLogin);
     router.post("/logout", apiController.handleLogout);
 

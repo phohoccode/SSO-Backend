@@ -71,7 +71,7 @@
     });
   </script>
 
-  <body>
+  <body style="display: flex; align-items: center; min-height: 100vh;">
     <input type="text" value="<%= redirectURL %>" hidden id="redirectURL" />
     <div class="container">
       <div class="row">
@@ -110,9 +110,15 @@
                 Đăng nhập
               </button>
               <div class="text-center mt-3 cursor-pointer">
-                <a href="/forgot-password" class="text-decoration-none" href="/forgot-password"
+                <a href="/forgot-password" class="text-decoration-none"
                   >Quên mật khẩu?
                 </a>
+                <div>
+                    <span>Chưa có tài khoản ?</span>
+                    <a href="/register?serviceURL=<%= redirectURL %>" class="text-decoration-none"
+                      >Đăng ký
+                    </a>
+                </div>
               </div>
 
               <hr />

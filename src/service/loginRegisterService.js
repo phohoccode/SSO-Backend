@@ -205,12 +205,22 @@ const getUserByRefreshToken = async (token) => {
 }
 
 
-const updateUserCode = async (code, email) => {
+const updateUserCode = async (code, email, type) => {
     try {
-        await db.User.update(
-            { code: code },
-            { where: { email: email, type: 'LOCAL' } }
-        )
+
+        if (type === 'forgot-password') {
+            await db.User.update(
+                { code: code },
+                { where: { email: email, type: 'LOCAL' } }
+            )
+        } else {
+            await db.UserRegister.destroy({ where: { email: email } })
+            await db.UserRegister.create({
+                email: email,
+                code: code
+            })
+
+        }
     } catch (error) {
         console.log(error)
         return {
@@ -276,7 +286,56 @@ const resetUserPassword = async (rawData) => {
     }
 }
 
+const registerAccount = async (rawData) => {
+    try {
+        console.log('rawData', rawData)
+        const user = await checkEmailExist(rawData.email)
+
+        if (user) {
+            return {
+                EC: -1,
+                EM: 'Tài khoản email đã tồn tại!'
+            }
+        }
+
+        const userRegister = await db.UserRegister.findOne({
+            where: { email: rawData.email },
+            raw: true
+        })
+
+        console.log('>>> userRegister', userRegister)
+
+        if (userRegister.code !== rawData.code) {
+            return {
+                EC: -1,
+                EM: 'Mã xác nhận không chính xác!'
+            }
+        }
+
+        const hashPassword = hashUserPassword(rawData.password)
+
+        if (userRegister.code === rawData.code) {
+            await db.User.create({
+                username: rawData.username,
+                email: rawData.email,
+                password: hashPassword,
+                type: 'LOCAL'
+            })
+
+            return {
+                EC: 0,
+                EM: 'Tạo tài khoản thành công!'
+            }
+
+        }
+
+    } catch (error) {
+
+    }
+}
+
 module.exports = {
+    registerAccount,
     registerNewUser,
     handleUserLogin,
     hashUserPassword,
